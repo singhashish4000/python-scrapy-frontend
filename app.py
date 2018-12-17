@@ -32,26 +32,6 @@ def about():
     return render_template('about.html')
 
 
-# Articles
-@app.route('/articles')
-def articles():
-    # Create cursor
-    cur = mysql.connection.cursor()
-
-    # Get articles
-    result = cur.execute("SELECT * FROM articles")
-
-    articles = cur.fetchall()
-
-    if result > 0:
-        return render_template('articles.html', articles=articles)
-    else:
-        msg = 'No Articles Found'
-        return render_template('articles.html', msg=msg)
-    # Close connection
-    cur.close()
-
-
 # Register Form Class
 class RegisterForm(Form):
     name = StringField('Name', [validators.Length(min=1, max=50)])
@@ -157,7 +137,7 @@ def logout():
 @is_logged_in
 def dashboard():
     location = session['location']
-    with open('data/'+location+'_doc.json') as f:
+    with open('data/'+location+'_doc_details.json') as f:
          data = json.load(f)
 
     return render_template('dashboard.html', articles=data)
