@@ -1,10 +1,11 @@
 from flask import Flask, render_template, flash, redirect, url_for, session, request, logging
 #from data import Articles
 from flask_mysqldb import MySQL
-from wtforms import Form, StringField, TextAreaField, PasswordField, validators
+from wtforms import Form, StringField, TextAreaField, PasswordField, validators, SelectField
 from passlib.hash import sha256_crypt
 from functools import wraps
 import json
+import pandas as pd
 from pprint import pprint
 
 app = Flask(__name__)
@@ -33,10 +34,12 @@ def about():
 
 
 # Register Form Class
-class RegisterForm(Form):
+class RegisterForm(Form): 
+    select_fields = [('agra', 'Agra'), ('mumbai', 'Mumbai'), ('thane', 'Thane'), 
+    ('amritsar', 'Amritsar'), ('kolkata', 'Kolkata') , ('thane', 'Thane') , ('surat', 'Surat')]
     name = StringField('Name', [validators.Length(min=1, max=50)])
     username = StringField('Username', [validators.Length(min=4, max=25)])
-    location = StringField('Location', [validators.Length(min=4, max=25)])
+    location = SelectField(u'City Name', choices=select_fields)
     email = StringField('Email', [validators.Length(min=6, max=50)])
     password = PasswordField('Password', [
         validators.DataRequired(),
@@ -136,11 +139,25 @@ def logout():
 @app.route('/dashboard')
 @is_logged_in
 def dashboard():
+    sort = request.args.get('sort')
+    print("Query",sort)
     location = session['location']
-    with open('data/'+location+'_doc_details.json') as f:
-         data = json.load(f)
+    print("Location",location)
+    # with open('data/'+location+'_doc_details.json') as f:
+    #      data = json.load(f)
+    df = pd.read_csv('data/'+location+'_doc_details.csv', encoding="iso-8859-1")
+    m = ""
+    movie_names = pd.read_csv("data/"+location+"_doc_details.csv",encoding='latin1')  
+    if sort is not None: 
+      if sort == 'Rating':   
+         m = movie_names.sort_values(by=sort+'(%)',ascending=False)
+      elif sort == 'Fee':
+         m = movie_names.sort_values(by=sort+'(INR)',ascending=False)    
+    else: 
+      m = df  
+    print(m)
 
-    return render_template('dashboard.html', articles=data)
+    return render_template('dashboard.html', data1=(m),sorted_by=sort)
 
 
 

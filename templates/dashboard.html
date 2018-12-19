@@ -3,30 +3,13 @@
 {% block body %}
   <h1><small> Welcome {{session.username}}</small></h1>
   <h2>Your Location: {{session.location}}</h2>
+  <a href="/dashboard?sort=Rating">Sort By Rating</a>
+  <a href="/dashboard?sort=Fee"> Sort By Fee</a>
   <hr>
-  <table class="table table-striped">
-    <tr>
-      <th>Photo</th>
-      <th>Name</th>
-      <th>Qualification</th>
-      <th>Designation</th>
-      <th>Experience</th>
-      <th>Fees</th>
-      <th>Rating</th>
-      <th>Hospital</th>
-    </tr>
-    {% for article in articles %}
-      <tr>
-        <td><img src={{article.Image[0]}} width="100" height="100" style="
-        border-radius:50%"></td>
-        <td>{{article.Name[0]}}</td>
-        <td>{{article.Qualification[0]}}</td>
-        <td>{{article.Qualification[1]}}</td>
-        <td>{{article.Qualification[4]}}</td>
-        <td>{{article.Fee[0]}}</td>
-        <td>{{article.Rating[0]}}</td>
-        <td>{{article.Place[0]}}</td>
-      </tr>
-    {% endfor %}
-  </table>
+  <h1>
+   Sorted By - {{ sorted_by }}
+  </h1>
+  {% block content %}
+    {{ data1.to_html(classes="table table-striped") | safe}}
+  {% endblock %}
 {% endblock %}
